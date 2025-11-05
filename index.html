@@ -4,31 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>аписать мне</title>
+
+  <!-- Favicon + OpenGraph -->
   <link rel="icon" href="https://t.me/favicon.ico">
   <meta property="og:title" content="аталья икольская  Telegram">
   <meta property="og:description" content="втор канала ять ключей здоровья. аписать в личные сообщения или открыть канал.">
   <meta property="og:image" content="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://t.me/+i-vyyKHvwAU3YjBi">
   <meta property="og:type" content="website">
+
   <style>
     :root { --bg:#0e1013; --fg:#fff; --blue:#0088cc; --blue2:#006fa8; --muted:#aab2bd; --card:rgba(255,255,255,.04); --bord:rgba(255,255,255,.06); }
     * { box-sizing:border-box; }
-    body { margin:0; background:var(--bg); color:var(--fg);
+    body {
+      margin:0; background:var(--bg); color:var(--fg);
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      display:flex; min-height:100vh; align-items:center; justify-content:center; }
+      display:flex; min-height:100vh; align-items:center; justify-content:center;
+    }
     .wrap { width:100%; max-width:820px; padding:32px; text-align:center; }
     h1 { margin:0 0 12px; font-weight:700; font-size:28px; }
-    p { margin:0 0 20px; color:var(--muted); font-size:16px; line-height:1.45; }
+    p  { margin:0 0 20px; color:var(--muted); font-size:16px; line-height:1.45; }
     .row { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin:18px 0 26px; }
-    a.button, button.copy { display:inline-block; padding:16px 26px; font-size:18px; border-radius:10px;
+    a.button, button.copy {
+      display:inline-block; padding:16px 26px; font-size:18px; border-radius:10px;
       text-decoration:none; color:#fff; background:var(--blue); border:0; cursor:pointer;
-      transition:background .2s ease, transform .02s ease-in-out; }
+      transition:background .2s ease, transform .02s ease-in-out;
+    }
     a.button:hover, button.copy:hover { background:var(--blue2); }
     a.button:active, button.copy:active { transform:translateY(1px); }
     .card { background:var(--card); border:1px solid var(--bord); border-radius:12px; padding:18px; }
     .qr { display:block; margin:10px auto 6px; width:220px; height:220px; }
     .links a { color:#9ad0ff; text-decoration:none; } .links a:hover { text-decoration:underline; }
+
+    /* рогресс-бар */
     .bar { height:6px; width:100%; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden; margin:10px 0 6px; }
     .bar > i { display:block; height:100%; width:0%; background:var(--blue); transition:width .2s linear; }
+
+    /* Deep-link кнопка только на мобильных */
     .mobile-only { display:none; }
     @media (hover:none) and (pointer:coarse), (max-width:500px) {
       .mobile-only { display:inline-block; }
@@ -45,25 +56,67 @@
       втор Telegram-канала ять ключей здоровья. анал:&nbsp;
       <a href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">t.me/+i-vyyKHvwAU3YjBi</a>
     </p>
+
+    <!-- братный отсчёт + прогресс -->
     <div class="bar"><i id="prog"></i></div>
     <p id="countdown" style="color:#bbb; margin-top:0;">ереход через <span id="sec">5</span> сек.</p>
+
     <div class="row">
       <a class="button" href="https://t.me/natnik988">аписать мне</a>
       <a class="button mobile-only" href="tg://resolve?domain=natnik988">ткрыть в приложении</a>
       <button class="copy" id="btn-copy" data-link="https://t.me/natnik988">Скопировать ссылку</button>
       <a class="button" href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">ткрыть канал</a>
     </div>
+
     <div class="card">
       <img id="qr" class="qr" alt="QR на канал">
       <p class="links" style="margin:6px 0 0">Сканируйте QR, чтобы открыть канал ять ключей здоровья</p>
     </div>
   </main>
+
   <script>
-    const PROFILE_URL="https://t.me/natnik988";
-    const CHANNEL_URL="https://t.me/+i-vyyKHvwAU3YjBi";
-    document.getElementById('qr').src="https://api.qrserver.com/v1/create-qr-code/?size=512x512&data="+encodeURIComponent(CHANNEL_URL);
-    (function(){const btn=document.getElementById('btn-copy');btn.addEventListener('click',async()=>{const link=btn.dataset.link;try{await navigator.clipboard.writeText(link);btn.textContent='Ссылка скопирована';}catch(e){const ta=document.createElement('textarea');ta.value=link;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='Ссылка скопирована';}setTimeout(()=>btn.textContent='Скопировать ссылку',1800);});})();
-    (function(){let i=5;const sec=document.getElementById('sec'),prog=document.getElementById('prog');const total=5000,start=Date.now();const t=setInterval(()=>{const e=Date.now()-start;const left=Math.max(0,5-Math.floor(e/1000));if(left!==i){i=left;sec.textContent=i;}prog.style.width=Math.min(100,Math.floor(e/total*100))+'%';if(e>=total){clearInterval(t);location.href=PROFILE_URL;}},100);})();
+    // астройки ссылок
+    const PROFILE_URL = "https://t.me/natnik988";
+    const CHANNEL_URL = "https://t.me/+i-vyyKHvwAU3YjBi";
+
+    // инамический QR
+    document.getElementById('qr').src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=" + encodeURIComponent(CHANNEL_URL);
+
+    // опирование ссылки профиля
+    (function(){
+      const btn = document.getElementById('btn-copy');
+      btn.addEventListener('click', async () => {
+        const link = btn.getAttribute('data-link');
+        try {
+          await navigator.clipboard.writeText(link);
+          btn.textContent = 'Ссылка скопирована';
+        } catch (e) {
+          const ta = document.createElement('textarea');
+          ta.value = link; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+          btn.textContent = 'Ссылка скопирована';
+        }
+        setTimeout(() => btn.textContent = 'Скопировать ссылку', 1800);
+      });
+    })();
+
+    // братный отсчёт + прогресс + автопереход
+    (function(){
+      let i = 5;
+      const sec = document.getElementById('sec');
+      const prog = document.getElementById('prog');
+      const total = 5_000;
+      const started = Date.now();
+      const tick = setInterval(() => {
+        const elapsed = Date.now() - started;
+        const left = Math.max(0, 5 - Math.floor(elapsed/1000));
+        if (left !== i) { i = left; sec.textContent = i; }
+        const pct = Math.min(100, Math.floor(elapsed / total * 100));
+        prog.style.width = pct + "%";
+        if (elapsed >= total) { clearInterval(tick); location.href = PROFILE_URL; }
+      }, 100);
+    })();
   </script>
 </body>
 </html>
