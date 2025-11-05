@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Написать мне</title>
+  <meta http-equiv="refresh" content="5;url=https://t.me/natnik988">
   <style>
     :root { --bg:#0e1013; --fg:#fff; --blue:#0088cc; --blue2:#006fa8; --muted:#aab2bd; }
     * { box-sizing:border-box; }
@@ -33,8 +34,10 @@
       <a href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">t.me/+i-vyyKHvwAU3YjBi</a>
     </p>
 
+    <p style="margin-top:10px;color:#bbb;">Вы будете автоматически перенаправлены в Telegram через 5 секунд.</p>
+
     <div class="row">
-      <a class="button" id="btn-write" href="https://t.me/natnik988">Написать мне</a>
+      <a class="button" href="https://t.me/natnik988">Написать мне</a>
       <button class="copy" id="btn-copy" data-link="https://t.me/natnik988">Скопировать ссылку</button>
       <a class="button" href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">Открыть канал</a>
     </div>
@@ -47,17 +50,15 @@
   </main>
 
   <script>
-    // копирование ссылки профиля
+    // Копирование ссылки
     (function(){
       const btn=document.getElementById('btn-copy');
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', async ()=>{
         const link=btn.getAttribute('data-link');
-        try { await navigator.clipboard.writeText(link); btn.textContent='Ссылка скопирована';
-        } catch(e){
-          const ta=document.createElement('textarea'); ta.value=link; document.body.appendChild(ta);
-          ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-          btn.textContent='Ссылка скопирована';
-        }
+        try{await navigator.clipboard.writeText(link);btn.textContent='Ссылка скопирована';}
+        catch(e){const ta=document.createElement('textarea');ta.value=link;document.body.appendChild(ta);
+          ta.select();document.execCommand('copy');document.body.removeChild(ta);
+          btn.textContent='Ссылка скопирована';}
         setTimeout(()=>btn.textContent='Скопировать ссылку',1800);
       });
     })();
