@@ -3,8 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="origin-when-cross-origin">
   <title>Написать мне</title>
-  <meta http-equiv="refresh" content="5;url=https://t.me/natnik988">
+  <script>
+    // Настройки редиректа
+    // 1) Deep-link для открытия приложения Telegram
+    const TG_DEEPLINK_DEFAULT = "tg://resolve?domain=natnik988";
+
+    // 2) Web-fallback (если приложение не открылось)
+    const TG_WEB_FALLBACK_DEFAULT = "https://t.me/natnik988";
+
+    // 3) ID счётчика Яндекс.Метрики
+    const YA_COUNTER_ID = 104141664;
+  </script>
+  <script>
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments);};
+      m[i].l=1*new Date();
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0];
+      k.async=1;k.src=r;a.parentNode.insertBefore(k,a);
+    })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(YA_COUNTER_ID, 'init', {
+      clickmap:true,
+      trackLinks:true,
+      accurateTrackBounce:true,
+      defer:true
+    });
+  </script>
+  <noscript>
+    <div><img src="https://mc.yandex.ru/watch/104141664" style="position:absolute; left:-9999px;" alt="" /></div>
+  </noscript>
   <style>
     :root { --bg:#0e1013; --fg:#fff; --blue:#0088cc; --blue2:#006fa8; --muted:#aab2bd; }
     * { box-sizing:border-box; }
@@ -31,15 +60,15 @@
     <h1>Наталья Никольская</h1>
     <p class="links">
       Автор Telegram-канала «Пять ключей здоровья». Канал:&nbsp;
-      <a href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">t.me/+i-vyyKHvwAU3YjBi</a>
+      <a id="channel-inline-link" href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">t.me/+i-vyyKHvwAU3YjBi</a>
     </p>
 
-    <p style="margin-top:10px;color:#bbb;">Вы будете автоматически перенаправлены в Telegram через 5 секунд.</p>
+    <p style="margin-top:10px;color:#bbb;">Телеграм откроется автоматически в течение пары секунд. Если этого не произошло — нажмите кнопку.</p>
 
     <div class="row">
-      <a class="button" href="https://t.me/natnik988">Написать мне</a>
-      <button class="copy" id="btn-copy" data-link="https://t.me/natnik988">Скопировать ссылку</button>
-      <a class="button" href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">Открыть канал</a>
+      <a class="button" id="btn-open" href="https://t.me/natnik988">Написать мне</a>
+      <button class="copy" id="btn-copy" type="button">Скопировать ссылку</button>
+      <a class="button" id="btn-channel" href="https://t.me/+i-vyyKHvwAU3YjBi" target="_blank" rel="noopener">Открыть канал</a>
     </div>
 
     <div class="card">
@@ -50,16 +79,124 @@
   </main>
 
   <script>
-    // Копирование ссылки
     (function(){
-      const btn=document.getElementById('btn-copy');
-      btn.addEventListener('click', async ()=>{
-        const link=btn.getAttribute('data-link');
-        try{await navigator.clipboard.writeText(link);btn.textContent='Ссылка скопирована';}
-        catch(e){const ta=document.createElement('textarea');ta.value=link;document.body.appendChild(ta);
-          ta.select();document.execCommand('copy');document.body.removeChild(ta);
-          btn.textContent='Ссылка скопирована';}
-        setTimeout(()=>btn.textContent='Скопировать ссылку',1800);
+      const params = new URLSearchParams(window.location.search);
+      const utmEntries = [];
+      params.forEach((value, key) => {
+        if (key && key.toLowerCase().startsWith('utm_')) {
+          utmEntries.push([key, value]);
+        }
+      });
+
+      function withUTM(url) {
+        if (!url || !utmEntries.length) {
+          return url;
+        }
+        try {
+          const parsed = new URL(url, window.location.href);
+          utmEntries.forEach(([key, value]) => parsed.searchParams.set(key, value));
+          return parsed.toString();
+        } catch (e) {
+          const separator = url.includes('?') ? '&' : '?';
+          const query = utmEntries
+            .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))
+            .join('&');
+          return url + (query ? separator + query : '');
+        }
+      }
+
+      const TG_DEEPLINK = params.get('tg') || TG_DEEPLINK_DEFAULT;
+      const TG_WEB_FALLBACK = params.get('fallback') || TG_WEB_FALLBACK_DEFAULT;
+      const CHANNEL_URL = 'https://t.me/+i-vyyKHvwAU3YjBi';
+
+      function goal(name) {
+        if (!name) return;
+        try { ym(YA_COUNTER_ID, 'reachGoal', name); } catch (e) {}
+      }
+
+      function sendMetrikaHit() {
+        try {
+          ym(YA_COUNTER_ID, 'hit', location.href);
+          ym(YA_COUNTER_ID, 'reachGoal', 'tg_redirect_open');
+        } catch (e) {}
+      }
+
+      let redirectTimers = [];
+      function openTelegramChain() {
+        sendMetrikaHit();
+        redirectTimers.forEach(clearTimeout);
+        redirectTimers = [];
+        redirectTimers.push(setTimeout(function () {
+          window.location.href = withUTM(TG_DEEPLINK);
+        }, 350));
+        redirectTimers.push(setTimeout(function () {
+          window.location.href = withUTM(TG_WEB_FALLBACK);
+        }, 1500));
+      }
+
+      function setupCopy(btn) {
+        if (!btn) return;
+        btn.addEventListener('click', async function (e) {
+          e.preventDefault();
+          const link = withUTM(TG_WEB_FALLBACK);
+          try {
+            await navigator.clipboard.writeText(link);
+            btn.textContent = 'Ссылка скопирована';
+          } catch (err) {
+            const ta = document.createElement('textarea');
+            ta.value = link;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'absolute';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.textContent = 'Ссылка скопирована';
+          }
+          goal('copy_link');
+          setTimeout(() => btn.textContent = 'Скопировать ссылку', 1800);
+        });
+      }
+
+      function updateLink(el, url) {
+        if (el && url) {
+          el.setAttribute('href', withUTM(url));
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const btnOpen = document.getElementById('btn-open');
+        const btnChannel = document.getElementById('btn-channel');
+        const btnCopy = document.getElementById('btn-copy');
+        const inlineChannelLink = document.getElementById('channel-inline-link');
+
+        if (btnOpen) {
+          updateLink(btnOpen, TG_WEB_FALLBACK);
+          btnOpen.addEventListener('click', function (e) {
+            e.preventDefault();
+            goal('open_app');
+            openTelegramChain();
+          });
+        }
+
+        if (btnChannel) {
+          updateLink(btnChannel, CHANNEL_URL);
+          btnChannel.addEventListener('click', function () {
+            goal('open_web');
+          });
+        }
+
+        if (inlineChannelLink) {
+          updateLink(inlineChannelLink, CHANNEL_URL);
+          inlineChannelLink.addEventListener('click', function () {
+            goal('open_web');
+          });
+        }
+
+        setupCopy(btnCopy);
+
+        openTelegramChain();
       });
     })();
   </script>
