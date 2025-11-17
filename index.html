@@ -13,8 +13,23 @@
     // 2) Web-fallback (если приложение не открылось)
     const TG_WEB_FALLBACK_DEFAULT = "https://t.me/natnik988";
 
-    // 3) ID счётчика Яндекс.Метрики
+    // 3) Магазины приложений для запасного сценария
+    const TG_STORE_IOS = "https://apps.apple.com/app/telegram-messenger/id686449807";
+    const TG_STORE_ANDROID = "https://play.google.com/store/apps/details?id=org.telegram.messenger";
+
+    // 4) ID счётчика Яндекс.Метрики
     const YA_COUNTER_ID = 104141664;
+    window.YA_COUNTER_ID = YA_COUNTER_ID;
+    const counterId = YA_COUNTER_ID;
+
+    function sendMetrikaHit(goalName) {
+      try {
+        ym(counterId, 'hit', location.href);
+        if (goalName) {
+          ym(counterId, 'reachGoal', goalName);
+        }
+      } catch (_) {}
+    }
   </script>
   <script>
     (function(m,e,t,r,i,k,a){
@@ -22,7 +37,7 @@
       m[i].l=1*new Date();
       k=e.createElement(t),a=e.getElementsByTagName(t)[0];
       k.async=1;k.src=r;a.parentNode.insertBefore(k,a);
-    })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=104141664", "ym");
 
     ym(YA_COUNTER_ID, 'init', {
       clickmap:true,
@@ -111,27 +126,34 @@
 
       function goal(name) {
         if (!name) return;
-        try { ym(YA_COUNTER_ID, 'reachGoal', name); } catch (e) {}
+        try { ym(counterId, 'reachGoal', name); } catch (e) {}
       }
 
-      function sendMetrikaHit() {
-        try {
-          ym(YA_COUNTER_ID, 'hit', location.href);
-          ym(YA_COUNTER_ID, 'reachGoal', 'tg_redirect_open');
-        } catch (e) {}
+      const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      const isAndroid = /Android/.test(ua);
+
+      function tryOpenApp(){
+        if (isIOS) {
+          location.href = withUTM(TG_WEB_FALLBACK);
+          setTimeout(()=>{ location.href = withUTM(TG_STORE_IOS); }, 1800);
+        } else if (isAndroid) {
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = withUTM(TG_DEEPLINK);
+          document.body.appendChild(iframe);
+          setTimeout(()=>{ location.href = withUTM(TG_WEB_FALLBACK); }, 800);
+          setTimeout(()=>{ location.href = withUTM(TG_STORE_ANDROID); }, 1800);
+        } else {
+          location.href = withUTM(TG_WEB_FALLBACK);
+        }
       }
 
-      let redirectTimers = [];
-      function openTelegramChain() {
-        sendMetrikaHit();
-        redirectTimers.forEach(clearTimeout);
-        redirectTimers = [];
-        redirectTimers.push(setTimeout(function () {
-          window.location.href = withUTM(TG_DEEPLINK);
-        }, 350));
-        redirectTimers.push(setTimeout(function () {
-          window.location.href = withUTM(TG_WEB_FALLBACK);
-        }, 1500));
+      function startTelegramRedirect(isAuto) {
+        sendMetrikaHit(isAuto ? 'auto_open' : 'click_open');
+        setTimeout(() => {
+          tryOpenApp();
+        }, 350);
       }
 
       function setupCopy(btn) {
@@ -175,8 +197,7 @@
           updateLink(btnOpen, TG_WEB_FALLBACK);
           btnOpen.addEventListener('click', function (e) {
             e.preventDefault();
-            goal('open_app');
-            openTelegramChain();
+            startTelegramRedirect(false);
           });
         }
 
@@ -196,7 +217,7 @@
 
         setupCopy(btnCopy);
 
-        openTelegramChain();
+        startTelegramRedirect(true);
       });
     })();
   </script>
