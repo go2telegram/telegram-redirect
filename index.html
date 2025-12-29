@@ -7,11 +7,13 @@
   <title>Написать мне</title>
   <script>
     // Настройки редиректа
+    const TG_HANDLE = "nat_5key";
+
     // 1) Deep-link для открытия приложения Telegram
-    const TG_DEEPLINK_DEFAULT = "tg://resolve?domain=nat_5key";
+    const TG_DEEPLINK_DEFAULT = `tg://resolve?domain=${TG_HANDLE}`;
 
     // 2) Web-fallback (если приложение не открылось)
-    const TG_WEB_FALLBACK_DEFAULT = "https://t.me/nat_5key";
+    const TG_WEB_FALLBACK_DEFAULT = `https://t.me/${TG_HANDLE}`;
 
     // 3) Магазины приложений для запасного сценария
     const TG_STORE_IOS = "https://apps.apple.com/app/telegram-messenger/id686449807";
@@ -120,8 +122,8 @@
         }
       }
 
-      const TG_DEEPLINK = params.get('tg') || TG_DEEPLINK_DEFAULT;
-      const TG_WEB_FALLBACK = params.get('fallback') || TG_WEB_FALLBACK_DEFAULT;
+      const TG_DEEPLINK = TG_DEEPLINK_DEFAULT;
+      const TG_WEB_FALLBACK = TG_WEB_FALLBACK_DEFAULT;
       const CHANNEL_URL = 'https://t.me/+i-vyyKHvwAU3YjBi';
 
       function goal(name) {
